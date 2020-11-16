@@ -27,12 +27,12 @@ def checkInStock():
     if status=="Sold Out":
         currTime = datetime.datetime.now()
         print("[{0}] Not in stock - {1}".format(currTime, name))
-        driver.close()
+        driver.quit()
         callInStock()
     else:
         print("In stock!")
         command = "start firefox -new-window {0}".format(url)
         os.system(command)
-        driver.close()
+        driver.quit()
 
 checkInStock()
