@@ -1,1 +1,1 @@
-python deal.py
+python deal.py 2
