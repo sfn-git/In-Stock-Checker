@@ -32,6 +32,8 @@ else:
 
 # Program that allows for wait
 def callInStock():
+    global timeoutAttempts
+    timeoutAttempts = 0
     global attempts 
     attempts += 1
     seconds=randrange(10)
