@@ -14,7 +14,7 @@ def callInStock():
     checkInStock()
 
 def checkInStock():
-    
+    print("checking...")
     options = Options()
     options.headless = True
     driver=webdriver.Firefox(options=options, executable_path="geckodriver.exe")
@@ -33,6 +33,6 @@ def checkInStock():
         print("In stock!")
         command = "start firefox -new-window {0}".format(url)
         os.system(command)
-        driver.quit()
+        driver.quit+()
 
 checkInStock()
