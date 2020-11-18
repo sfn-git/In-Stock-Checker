@@ -27,7 +27,7 @@ elif mode == "2":
         else: 
             urls.append(url)
 else:
-    print("Enter a valid mode arg. Exiting....")
+    print("Enter a valid mode arg (Example: python deal.py (1 or 2)). Exiting....")
     sys.exit()
 
 # Program that allows for wait
@@ -36,9 +36,9 @@ def callInStock():
     timeoutAttempts = 0
     global attempts 
     attempts += 1
-    seconds=randrange(10)
-    print("sleeping for {0} seconds".format(seconds))
-    time.sleep(seconds)
+    # seconds=randrange(10)
+    # print("sleeping for {0} seconds".format(seconds))
+    # time.sleep(seconds)
     checkInStock()
 
 #Checks each url to see if item is in stock
@@ -67,14 +67,14 @@ def checkInStock():
             name = item_name.text #Gets item name
 
             #Checks if item is sold out
-            if status=="Sold Out":
+            if status=="Coming Soon" or status=="Sold Out":
                 currTime = datetime.datetime.now()
-                print("[{0}] Not in stock - {1}".format(currTime, name))
-                seconds = randrange(5)
-                time.sleep(seconds)
+                print("[{0}] {2} - {1}".format(currTime, name, status))
+                # seconds = randrange(5)
+                # time.sleep(seconds)
             else:
                 currTime = datetime.datetime.now()
-                print("[{1}] In stock! - {0}".format(name, currTime))
+                print("[{1}] Needs Checking! - {0}".format(name, currTime))
                 command = "start firefox -new-window {0}".format(url)
                 os.system(command)
                 urls.remove(url)
