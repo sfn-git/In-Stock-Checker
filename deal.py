@@ -1,44 +1,58 @@
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.common.exceptions import TimeoutException
-import os
 from random import randrange
+import os
 import time
 import datetime
 import sys
+import re
+import json
 
 userInput = True
-urls = []
+urls = {
+    "bestbuy": [],
+    "newegg": []
+}
 global attempts
 attempts = 1
-mode = sys.argv[1]
+mode = input("Select 1 for args, 2 for manual input (1 default): ")
 global timeoutAttempts
 timeoutAttempts = 0
 
-if mode == "1":
-    argList = sys.argv[2:]
-    for url in argList:
-        urls.append(url)
-elif mode == "2":
+def getWebsite(url):
+    if re.search("bestbuy", url):
+        return "bestbuy"
+    elif re.search("newegg", url):
+        return "newegg"
+    else:
+        return False
+
+if mode == "2":
     while userInput:
-        url = input("Enter Bestbuy URL (press enter when done): ")
+        url = input("Enter Bestbuy or Newegg URL (press enter when done): ")
         if url == "":
             userInput = False
         else: 
-            urls.append(url)
+            site = getWebsite(url)
+            if site != False:
+                urls[site].append(url)
+            else:
+                print("{0} is not a bestbuy or newegg url. Please enter valid url".format(url))
 else:
-    print("Enter a valid mode arg (Example: python deal.py (1 or 2)). Exiting....")
-    sys.exit()
-
+    argList = sys.argv[2:]
+    for url in argList:
+        site = getWebsite(url)
+        if site != False:
+            urls[site].append(url)
+        else:
+            print("{0} is not a bestbuy or newegg url.".format(url))
 # Program that allows for wait
 def callInStock():
     global timeoutAttempts
     timeoutAttempts = 0
     global attempts 
     attempts += 1
-    # seconds=randrange(10)
-    # print("sleeping for {0} seconds".format(seconds))
-    # time.sleep(seconds)
     checkInStock()
 
 #Checks each url to see if item is in stock
@@ -55,29 +69,48 @@ def checkInStock():
     options = Options()
     options.headless = True
     driver=webdriver.Firefox(options=options, executable_path="geckodriver.exe")
-    driver.set_page_load_timeout(5)
+    driver.set_page_load_timeout(15)
     try:
         #loops through urls
-        for url in urls:
-            #makes request to page
-            driver.get(url)
-            cart_button = driver.find_element_by_class_name("fulfillment-add-to-cart-button") 
-            item_name = driver.find_element_by_class_name("sku-title") 
-            status = cart_button.text #Gets the text of the cart button
-            name = item_name.text #Gets item name
+        for site in urls:
+            for url in urls[site]:
+                #makes request to page
+                driver.get(url)
+                if site == "bestbuy":
+                    cart_button = driver.find_element_by_class_name("fulfillment-add-to-cart-button") 
+                    item_name = driver.find_element_by_class_name("sku-title") 
+                    status = cart_button.text #Gets the text of the cart button
+                    name = item_name.text #Gets item name
 
-            #Checks if item is sold out
-            if status=="Coming Soon" or status=="Sold Out":
-                currTime = datetime.datetime.now()
-                print("[{0}] {2} - {1}".format(currTime, name, status))
-                # seconds = randrange(5)
-                # time.sleep(seconds)
-            else:
-                currTime = datetime.datetime.now()
-                print("[{1}] Needs Checking! - {0}".format(name, currTime))
-                command = "start firefox -new-window {0}".format(url)
-                os.system(command)
-                urls.remove(url)
+                    #Checks if item is sold out
+                    if status=="Coming Soon" or status=="Sold Out":
+                        currTime = datetime.datetime.now()
+                        print("[{0} ({3})] {2} - {1}".format(currTime, name, status, site))
+                    else:
+                        currTime = datetime.datetime.now()
+                        print("[{1}] Needs Checking! - {0}".format(name, currTime))
+                        command = "start firefox -new-window {0}".format(url)
+                        os.system(command)
+                        driver.close()
+                        driver.quit()
+                        sys.exit()
+                elif site == "newegg":
+                    cart_button = driver.find_element_by_id("ProductBuy") 
+                    item_name = driver.find_element_by_class_name("product-title") 
+                    status = cart_button.text #Gets the text of the cart button
+                    name = item_name.text #Gets item name
+                    #Checks if item is sold out
+                    if status=="SOLD OUT":
+                        currTime = datetime.datetime.now()
+                        print("[{0} ({3})] {2} - {1}".format(currTime, name, status, site))
+                    else:
+                        currTime = datetime.datetime.now()
+                        print("[{1}] Needs Checking! - {0}".format(name, currTime))
+                        command = "start firefox -new-window {0}".format(url)
+                        os.system(command)
+                        driver.close()
+                        driver.quit()
+                        sys.exit()
         #Closes the headless windows
         driver.close()
         driver.quit()
@@ -99,3 +132,4 @@ def checkInStock():
         sys.exit()
 
 checkInStock()
+
