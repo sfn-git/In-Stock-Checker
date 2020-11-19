@@ -1,1 +1,0 @@
-python deal.py 2
