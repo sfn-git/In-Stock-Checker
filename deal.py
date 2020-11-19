@@ -16,7 +16,7 @@ urls = {
 }
 global attempts
 attempts = 1
-mode = input("Select 1 for args, 2 for manual input (1 default): ")
+mode = sys.argv[1]
 global timeoutAttempts
 timeoutAttempts = 0
 
