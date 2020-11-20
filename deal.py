@@ -1,9 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.common.exceptions import TimeoutException
-from random import randrange
 import os
-import time
 import datetime
 import sys
 import re
@@ -12,7 +10,8 @@ import json
 userInput = True
 urls = {
     "bestbuy": [],
-    "newegg": []
+    "newegg": [],
+    "reddit": []
 }
 global attempts
 attempts = 1
@@ -25,6 +24,8 @@ def getWebsite(url):
         return "bestbuy"
     elif re.search("newegg", url):
         return "newegg"
+    elif re.search("reddit", url) and re.search("new.json", url):
+        return "reddit"
     else:
         return False
 
@@ -38,7 +39,7 @@ if mode == "2":
             if site != False:
                 urls[site].append(url)
             else:
-                print("{0} is not a bestbuy or newegg url. Please enter valid url".format(url))
+                print("{0} is not a bestbuy, newegg, or reddit with new.json url. Please enter valid url".format(url))
 else:
     argList = sys.argv[2:]
     for url in argList:
@@ -111,6 +112,8 @@ def checkInStock():
                         driver.close()
                         driver.quit()
                         sys.exit()
+                elif site == "reddit":
+                    print("reddit")
         #Closes the headless windows
         driver.close()
         driver.quit()
@@ -132,4 +135,3 @@ def checkInStock():
         sys.exit()
 
 checkInStock()
-
