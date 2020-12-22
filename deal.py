@@ -101,7 +101,7 @@ def checkInStock():
                     status = cart_button.text #Gets the text of the cart button
                     name = item_name.text #Gets item name
                     #Checks if item is sold out
-                    if status=="SOLD OUT":
+                    if status=="SOLD OUT" or status=="Auto Notify":
                         currTime = datetime.datetime.now()
                         print("[{0} ({3})] {2} - {1}".format(currTime, name, status, site))
                     else:
